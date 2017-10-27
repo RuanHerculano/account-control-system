@@ -10,22 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027011730) do
+ActiveRecord::Schema.define(version: 20171027122014) do
+
+  create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.bigint "corporate_entity_id"
+    t.bigint "individual_entity_id"
+    t.bigint "account_id"
+    t.integer "level"
+    t.integer "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_accounts_on_account_id"
+    t.index ["corporate_entity_id"], name: "index_accounts_on_corporate_entity_id"
+    t.index ["individual_entity_id"], name: "index_accounts_on_individual_entity_id"
+    t.index ["status"], name: "index_accounts_on_status"
+  end
 
   create_table "corporate_entities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "cnpj"
-    t.string "business"
-    t.string "trading_name"
+    t.string "cnpj", null: false
+    t.string "business", null: false
+    t.string "trading_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "individual_entities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "cpf"
-    t.string "full_name"
-    t.date "date_birth"
+    t.string "cpf", null: false
+    t.string "full_name", null: false
+    t.date "date_birth", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "accounts", "accounts"
+  add_foreign_key "accounts", "corporate_entities"
+  add_foreign_key "accounts", "individual_entities"
 end

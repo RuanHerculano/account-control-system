@@ -5,10 +5,20 @@ individual_entity = IndividualEntity.create(cpf: 'MyString', full_name: 'MyStrin
 Account.create!(
   name: 'MyString',
   corporate_entity: corporate_entity,
+  individual_entity: nil,
+  account: nil,
+  level: 0,
+  status: 'active'
+)
+
+Account.create!(
+  name: 'MyString',
+  corporate_entity: nil,
   individual_entity: individual_entity,
   account: nil,
   level: 0,
   status: 'active'
 )
+
 
 

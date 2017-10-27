@@ -10,21 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027122014) do
+ActiveRecord::Schema.define(version: 20171027140641) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "name"
+    t.string "name", null: false
     t.bigint "corporate_entity_id"
     t.bigint "individual_entity_id"
     t.bigint "account_id"
-    t.integer "level"
-    t.integer "status"
+    t.integer "level", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_accounts_on_account_id"
     t.index ["corporate_entity_id"], name: "index_accounts_on_corporate_entity_id"
     t.index ["individual_entity_id"], name: "index_accounts_on_individual_entity_id"
-    t.index ["status"], name: "index_accounts_on_status"
   end
 
   create_table "corporate_entities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -33,6 +32,28 @@ ActiveRecord::Schema.define(version: 20171027122014) do
     t.string "trading_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "financial_contributions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.float "value", limit: 24, null: false
+    t.bigint "destination_id", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_financial_contributions_on_code", unique: true
+    t.index ["destination_id"], name: "index_financial_contributions_on_destination_id"
+  end
+
+  create_table "financial_transactions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.float "value", limit: 24, null: false
+    t.bigint "origin_id", null: false
+    t.bigint "destination_id", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_financial_transactions_on_code", unique: true
+    t.index ["destination_id"], name: "index_financial_transactions_on_destination_id"
+    t.index ["origin_id"], name: "index_financial_transactions_on_origin_id"
   end
 
   create_table "individual_entities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -46,4 +67,7 @@ ActiveRecord::Schema.define(version: 20171027122014) do
   add_foreign_key "accounts", "accounts"
   add_foreign_key "accounts", "corporate_entities"
   add_foreign_key "accounts", "individual_entities"
+  add_foreign_key "financial_contributions", "accounts", column: "destination_id"
+  add_foreign_key "financial_transactions", "accounts", column: "destination_id"
+  add_foreign_key "financial_transactions", "accounts", column: "origin_id"
 end

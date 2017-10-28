@@ -36,12 +36,12 @@ ActiveRecord::Schema.define(version: 20171027140641) do
 
   create_table "financial_contributions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.float "value", limit: 24, null: false
-    t.bigint "destination_id", null: false
+    t.bigint "account_id", null: false
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_financial_contributions_on_account_id"
     t.index ["code"], name: "index_financial_contributions_on_code", unique: true
-    t.index ["destination_id"], name: "index_financial_contributions_on_destination_id"
   end
 
   create_table "financial_transactions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -67,7 +67,7 @@ ActiveRecord::Schema.define(version: 20171027140641) do
   add_foreign_key "accounts", "accounts"
   add_foreign_key "accounts", "corporate_entities", on_delete: :cascade
   add_foreign_key "accounts", "individual_entities", on_delete: :cascade
-  add_foreign_key "financial_contributions", "accounts", column: "destination_id"
+  add_foreign_key "financial_contributions", "accounts"
   add_foreign_key "financial_transactions", "accounts", column: "destination_id"
   add_foreign_key "financial_transactions", "accounts", column: "origin_id"
 end

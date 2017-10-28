@@ -1,4 +1,4 @@
 class FinancialTransaction < ApplicationRecord
-  belongs_to :origin_account, className: 'Account', foreign_key: 'account_id'
-  belongs_to :destination_account, className: 'Account', foreign_key: 'account_id'
+  belongs_to :account, className: 'Account', foreign_key: 'origin_id'
+  belongs_to :account, className: 'Account', foreign_key: 'destination_id'
 end

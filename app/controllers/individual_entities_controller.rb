@@ -15,12 +15,12 @@ class IndividualEntitiesController < ApplicationController
 
   # POST /individual_entities
   def create
-    @individual_entity = IndividualEntity.new(individual_entity_params)
+    result = IndividualEntitiesService.create_individual_entity(individual_entity_params)
 
-    if @individual_entity.save
-      render json: @individual_entity, status: :created, location: @individual_entity
+    if result.success
+      render json: result.response, status: result.status, location: result.response
     else
-      render json: @individual_entity.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 

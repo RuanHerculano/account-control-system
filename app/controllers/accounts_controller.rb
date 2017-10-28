@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  before_action :set_corporate_entity, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: [:show, :edit, :update, :destroy]
 
   # GET /corporate_entities
   def index
@@ -39,18 +39,19 @@ class AccountsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_account
-      @account = Account.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def account_params
-      params.require(:account).permit(:name,
-                                      :corporate_entity_id,
-                                      :individual_entity,
-                                      :account,
-                                      :level,
-                                      :status)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_account
+    @account = Account.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def account_params
+    params.require(:account).permit(:name,
+                                    :corporate_entity_id,
+                                    :individual_entity_id,
+                                    :account,
+                                    :level,
+                                    :status)
+  end
 end

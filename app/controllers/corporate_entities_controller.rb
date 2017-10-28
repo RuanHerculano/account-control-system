@@ -39,13 +39,14 @@ class CorporateEntitiesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_corporate_entity
-      @corporate_entity = CorporateEntity.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def corporate_entity_params
-      params.require(:corporate_entity).permit(:cnpj, :business, :trading_name)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_corporate_entity
+    @corporate_entity = CorporateEntity.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def corporate_entity_params
+    params.require(:corporate_entity).permit(:cnpj, :business, :trading_name)
+  end
 end

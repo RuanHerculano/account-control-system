@@ -4,7 +4,7 @@ class CreateAccounts < ActiveRecord::Migration[5.1]
       t.string :name, null: false
       t.references :corporate_entity, foreign_key: { on_delete: :cascade }
       t.references :individual_entity, foreign_key: { on_delete: :cascade }
-      t.references :account, foreign_key: true
+      t.references :account, foreign_key: { on_delete: :cascade }
       t.integer :level, null: false
       t.integer :status, null: false, default: 'active'
 

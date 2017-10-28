@@ -1,49 +1,46 @@
 class CorporateEntitiesController < ApplicationController
-  before_action :set_corporate_entity, only: [:show, :edit, :update, :destroy]
-
   # GET /corporate_entities
   def index
-    @corporate_entities = CorporateEntity.all
+    result = CorporateEntitiesService.index
 
-    render json: @corporate_entities
+    render json: result
   end
 
   # GET /corporate_entities/1
   def show
-    render json: @corporate_entity
+    result = CorporateEntitiesService.show(params[:id])
+
+    render json: result
   end
 
   # POST /corporate_entities
   def create
-    @corporate_entity = CorporateEntity.new(corporate_entity_params)
+    result = CorporateEntitiesService.create(corporate_entity_params)
 
-    if @corporate_entity.save
-      render json: @corporate_entity, status: :created, location: @corporate_entity
+    if result.success
+      render json: result.response, status: result.status, location: result.response
     else
-      render json: @corporate_entity.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /corporate_entities/1
   def update
-    if @corporate_entity.update(corporate_entity_params)
-      render json: @corporate_entity
+    result = CorporateEntitiesService.update(params[:id], corporate_entity_params)
+
+    if result.success
+      render json: result.response
     else
-      render json: @corporate_entity.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 
   # DELETE /corporate_entities/1
   def destroy
-    @corporate_entity.destroy
+    CorporateEntitiesService.destroy(params[:id])
   end
 
   private
-
-  # Use callbacks to share common setup or constraints between actions.
-  def set_corporate_entity
-    @corporate_entity = CorporateEntity.find(params[:id])
-  end
 
   # Only allow a trusted parameter "white list" through.
   def corporate_entity_params

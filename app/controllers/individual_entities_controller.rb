@@ -1,21 +1,21 @@
 class IndividualEntitiesController < ApplicationController
-  before_action :set_individual_entity, only: [:show, :edit, :update, :destroy]
-
   # GET /individual_entities
   def index
-    @individual_entities = IndividualEntity.all
+    result = IndividualEntitiesService.index
 
-    render json: @individual_entities
+    render json: result
   end
 
   # GET /individual_entities/1
   def show
-    render json: @individual_entity
+    result = IndividualEntitiesService.show(params[:id])
+
+    render json: result
   end
 
   # POST /individual_entities
   def create
-    result = IndividualEntitiesService.create_individual_entity(individual_entity_params)
+    result = IndividualEntitiesService.create(individual_entity_params)
 
     if result.success
       render json: result.response, status: result.status, location: result.response
@@ -26,24 +26,21 @@ class IndividualEntitiesController < ApplicationController
 
   # PATCH/PUT /individual_entities/1
   def update
-    if @individual_entity.update(individual_entity_params)
-      render json: @individual_entity
+    result = IndividualEntitiesService.update(params[:id], individual_entity_params)
+
+    if result.success
+      render json: result.response
     else
-      render json: @individual_entity.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 
   # DELETE /individual_entities/1
   def destroy
-    @individual_entity.destroy
+    IndividualEntitiesService.destroy(params[:id])
   end
 
   private
-
-  # Use callbacks to share common setup or constraints between actions.
-  def set_individual_entity
-    @individual_entity = IndividualEntity.find(params[:id])
-  end
 
   # Only allow a trusted parameter "white list" through.
   def individual_entity_params

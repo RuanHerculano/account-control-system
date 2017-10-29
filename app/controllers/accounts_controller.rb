@@ -1,57 +1,53 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
-
   # GET /corporate_entities
   def index
-    @corporate_entities = Account.all
+    result = AccountsService.index
 
-    render json: @corporate_entities
+    render json: result
   end
 
   # GET /corporate_entities/1
   def show
-    render json: @account
+    result = AccountsService.show(params[:id])
+
+    render json: result
   end
 
   # POST /corporate_entities
   def create
-    @account = Account.new(account_params)
+    result = AccountsService.create(account_params)
 
-    if @account.save
-      render json: @account, status: :created, location: @account
+    if result.success
+      render json: result.response, status: result.status, location: result.response
     else
-      render json: @account.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 
   # PATCH/PUT /corporate_entities/1
   def update
-    if @account.update(account_params)
-      render json: @account
+    result = AccountsService.update(params[:id], account_params)
+
+    if result.success
+      render json: result.response
     else
-      render json: @account.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 
   # DELETE /corporate_entities/1
   def destroy
-    @account.destroy
+    AccountsService.destroy(params[:id])
   end
 
   private
-
-  # Use callbacks to share common setup or constraints between actions.
-  def set_account
-    @account = Account.find(params[:id])
-  end
 
   # Only allow a trusted parameter "white list" through.
   def account_params
     params.require(:account).permit(:name,
                                     :corporate_entity_id,
                                     :individual_entity_id,
-                                    :account,
-                                    :level,
+                                    :account_id,
                                     :status)
   end
 end

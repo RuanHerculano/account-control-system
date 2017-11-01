@@ -13,40 +13,31 @@ class FinancialContributionsController < ApplicationController
     render json: @financial_contribution
   end
 
-  # POST /financial_contribution
   def create
-    @financial_contribution = FinancialContribution.new(financial_contribution_params)
+    result = FinancialContributionsService.create(financial_contribution_params)
 
-    if @financial_contribution.save
-      render json: @financial_contribution, status: :created, location: @financial_contribution
+    if result.success
+      render json: result.response, status: result.status
     else
-      render json: @financial_contribution.errors, status: :unprocessable_entity
+      render json: result.response.errors, status: result.status
     end
   end
 
   # PATCH/PUT /financial_contribution/1
-  def update
-    if @financial_contribution.update(financial_contribution_params)
-      render json: @financial_contribution
-    else
-      render json: @financial_contribution.errors, status: :unprocessable_entity
-    end
-  end
+  def reversal
+    result = FinancialContributionsService.reversal(params[:id])
 
-  # DELETE /financial_contribution/1
-  def destroy
-    @financial_contribution.destroy
+    if result.success
+      render json: result.response
+    else
+      render json: result.response.errors, status: result.status
+    end
   end
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
-  def set_financial_contribution
-    @financial_contribution = FinancialContribution.find(params[:id])
-  end
-
   # Only allow a trusted parameter "white list" through.
   def financial_contribution_params
-    params.require(:financial_contribution).permit(:value, :account_id, :code)
+    params.require(:financial_contribution).permit(:value, :account_id)
   end
 end

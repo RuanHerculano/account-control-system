@@ -4,7 +4,7 @@ class CreateFinancialContributions < ActiveRecord::Migration[5.1]
       t.float :value, null: false
       t.references :account, foreign_key: true, null: false
       t.string :code, index: { unique: true }, null: false
-      t.integer :status, null: false
+      t.integer :status, null: false, default: 'completed'
 
       t.timestamps
     end

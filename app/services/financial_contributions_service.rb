@@ -20,21 +20,22 @@ class FinancialContributionsService
   end
 
   def self.reversal(id, financial_contribution_params)
-    success = false
-    status = :unprocessable_entity
     code = financial_contribution_params[:code]
     financial_contribution = FinancialContribution.find(id)
 
-    valid_status = validate_status(financial_contribution.status)
+    result_response = valid_status(financial_contribution)
+    return result_response unless result_response.status
 
-    update_result = reverval_financial_contribution(financial_contribution, code)
-    return update_result unless update_result.status
-
-    ResultResponseService.new(success, status, financial_contribution)
+    reverval_financial_contribution(financial_contribution, code)
   end
 
-  def self.validate_status(status)
+  def self.validate_status(financial_contribution)
+    if financial_contribution.status == 'reversaled'
+      financial_contribution.errors.add(:code, 'this reversal already been reversed ')
+      return ResultResponseService.new(false, :unprocessable_entity, financial_contribution)
+    end
 
+    ResultResponseService.new(true, nil, nil)
   end
 
   def self.reverval_financial_contribution(financial_contribution, code)

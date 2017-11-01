@@ -3,9 +3,11 @@ class FinancialTransactionsService
     success = false
     status = :unprocessable_entity
     financial_transaction = FinancialTransaction.new(financial_transaction_params)
-    account = Account.find(financial_transaction.origin_id)
+    origin_account = Account.find(financial_transaction.origin_id)
 
-    if account.value > financial_transaction.value
+    if origin_account.value > financial_transaction.value
+      subtract_origin(origin_account, financial_transaction)
+      increment_destination(financial_transaction)
       success = financial_transaction.save
       status = :created if success
     else
@@ -21,6 +23,8 @@ class FinancialTransactionsService
     financial_transaction = FinancialTransaction.find(id)
 
     if financial_transaction.status == 'completed'
+      origin_update(financial_transaction)
+      destination_update(financial_transaction)
       financial_transaction.update(status: 'reversaled')
     else
       success = false
@@ -30,4 +34,31 @@ class FinancialTransactionsService
 
     ResultResponseService.new(success, status, financial_transaction)
   end
+
+  def self.subtract_origin(origin_account, financial_transaction)
+    new_value = origin_account.value + financial_transaction.value
+    origin_account.update(value: new_value)
+  end
+  private_class_method :subtract_origin
+
+  def self.increment_destination(financial_transaction)
+    destination_account = Account.find(financial_transaction.destination_id)
+    new_value = destination_account.value + financial_transaction.value
+    destination_account.update(value: new_value)
+  end
+  private_class_method :increment_destination
+
+  def self.origin_update(financial_transaction)
+    origin_account = Account.find(financial_transaction.origin_id)
+    new_value = origin_account.value + financial_transaction.value
+    origin_account.update(value: new_value)
+  end
+  private_class_method :origin_update
+
+  def self.destination_update(financial_transaction)
+    destination_account = Account.find(financial_transaction.destination_id)
+    new_value = destination_account.value - financial_transaction.value
+    destination_account.update(value: new_value)
+  end
+  private_class_method :destination_update
 end

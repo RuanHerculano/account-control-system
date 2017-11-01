@@ -23,8 +23,8 @@ class FinancialTransactionsService
     financial_transaction = FinancialTransaction.find(id)
 
     if financial_transaction.status == 'completed'
-      origin_update(financial_transaction)
-      destination_update(financial_transaction)
+      update_origin(financial_transaction)
+      update_destination(financial_transaction)
       financial_transaction.update(status: 'reversaled')
     else
       success = false
@@ -48,17 +48,17 @@ class FinancialTransactionsService
   end
   private_class_method :increment_destination
 
-  def self.origin_update(financial_transaction)
+  def self.update_origin(financial_transaction)
     origin_account = Account.find(financial_transaction.origin_id)
     new_value = origin_account.value + financial_transaction.value
     origin_account.update(value: new_value)
   end
-  private_class_method :origin_update
+  private_class_method :update_origin
 
-  def self.destination_update(financial_transaction)
+  def self.update_destination(financial_transaction)
     destination_account = Account.find(financial_transaction.destination_id)
     new_value = destination_account.value - financial_transaction.value
     destination_account.update(value: new_value)
   end
-  private_class_method :destination_update
+  private_class_method :update_destination
 end

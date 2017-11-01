@@ -1,7 +1,7 @@
 require 'securerandom'
 
 class FinancialContributionsService
-  def create(financial_contribution_params)
+  def self.create(financial_contribution_params)
     success = false
     status = :unprocessable_entity
 
@@ -16,7 +16,35 @@ class FinancialContributionsService
       status = :created
     end
 
-     ResultResponseService.new(success, status, financial_contribution)
+    ResultResponseService.new(success, status, financial_contribution)
+  end
+
+  def self.reversal(id, financial_contribution_params)
+    success = false
+    status = :unprocessable_entity
+    code = financial_contribution_params[:code]
+    financial_contribution = FinancialContribution.find(id)
+
+    valid_status = validate_status(financial_contribution.status)
+
+    update_result = reverval_financial_contribution(financial_contribution, code)
+    return update_result unless update_result.status
+
+    ResultResponseService.new(success, status, financial_contribution)
+  end
+
+  def self.validate_status(status)
+
+  end
+
+  def self.reverval_financial_contribution(financial_contribution, code)
+    unless financial_contribution.code == code
+      financial_contribution.errors.add(:code, 'invalid code')
+      return ResultResponseService.new(success, status, financial_contribution)
+    end
+
+    financial_contribution.update(status: 'reversaled')
+    ResultResponseService.new(true, :updated, financial_contribution)
   end
 
   def self.generate_unique_code

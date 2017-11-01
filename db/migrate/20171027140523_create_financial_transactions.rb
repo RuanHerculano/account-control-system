@@ -5,6 +5,7 @@ class CreateFinancialTransactions < ActiveRecord::Migration[5.1]
       t.references :origin, foreign_key: { to_table: :accounts }, null: false
       t.references :destination, foreign_key: { to_table: :accounts }, null: false
       t.string :code, index: { unique: true }, null: false
+      t.integer :status, null: false, default: 'completed'
 
       t.timestamps
     end

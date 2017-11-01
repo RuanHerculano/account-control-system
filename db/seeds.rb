@@ -3,6 +3,7 @@ corporate_entity = CorporateEntity.create(cnpj: 'MyString', business: 'MyString'
 individual_entity = IndividualEntity.create(cpf: 'MyString', full_name: 'MyString', date_birth: '18/03/1995')
 
 Account.create!(
+  value: 0,
   name: 'MyString',
   corporate_entity: corporate_entity,
   individual_entity: nil,
@@ -12,6 +13,7 @@ Account.create!(
 )
 
 Account.create!(
+  value: 0,
   name: 'MyString',
   corporate_entity: nil,
   individual_entity: individual_entity,

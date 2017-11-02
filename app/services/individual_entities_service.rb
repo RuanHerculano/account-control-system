@@ -6,11 +6,9 @@ class IndividualEntitiesService
     success = false
     status = :unprocessable_entity
 
-    if valid_cpf?(individual_entity.cpf)
-      success = individual_entity.save
-      status = :created if success
-    else
-      individual_entity.errors.add(:cpf, 'invalid cpf')
+    if individual_entity.save
+      success = true
+      status = :created
     end
 
     ResultResponseService.new(success, status, individual_entity)
@@ -21,11 +19,9 @@ class IndividualEntitiesService
     success = false
     status = :unprocessable_entity
 
-    if valid_cpf?(individual_entity_params[:cpf])
-      success = individual_entity.update(individual_entity_params)
-      status = :updated if success
-    else
-      individual_entity.errors.add(:cpf, 'invalid cpf')
+    if individual_entity.update(individual_entity_params)
+      success = true
+      status = :updated
     end
 
     ResultResponseService.new(success, status, individual_entity)
@@ -39,7 +35,7 @@ class IndividualEntitiesService
     IndividualEntity.find(id)
   end
 
-  def destroy(id)
+  def self.destroy(id)
     individual_entity = IndividualEntity.find(id)
     individual_entity.destroy
   end

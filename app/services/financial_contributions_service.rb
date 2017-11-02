@@ -8,7 +8,8 @@ class FinancialContributionsService
     financial_contribution = FinancialContribution.new(
       value: financial_contribution_params[:value],
       account_id: financial_contribution_params[:account_id],
-      code: generate_unique_code
+      code: generate_unique_code,
+      status: 'completed'
     )
 
     if financial_contribution.save

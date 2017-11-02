@@ -28,6 +28,6 @@ class FinancialTransactionsController < ApplicationController
   private
 
   def financial_transaction_params
-    params.require(:financial_transaction).permit(:value, :origin_id, :destination_id, :code)
+    params.require(:financial_transaction).permit(:value, :origin_id, :destination_id)
   end
 end

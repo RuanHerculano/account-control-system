@@ -2,6 +2,7 @@ class FinancialTransactionsService
   def self.create(financial_transaction_params)
     success = false
     status = :unprocessable_entity
+    financial_transaction_params[:code] = generate_unique_code
     financial_transaction = FinancialTransaction.new(financial_transaction_params)
     origin_account = Account.find(financial_transaction.origin_id)
 
@@ -61,4 +62,16 @@ class FinancialTransactionsService
     destination_account.update(value: new_value)
   end
   private_class_method :update_destination
+
+  def self.generate_unique_code
+    code = nil
+
+    begin
+      code = SecureRandom.uuid
+      valid_code = FinancialContribution.find_by(code: code)
+    end while(!valid_code.blank?)
+
+    code
+  end
+  private_class_method :generate_unique_code
 end

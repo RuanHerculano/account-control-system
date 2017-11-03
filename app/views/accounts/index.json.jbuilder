@@ -1,4 +1,5 @@
 json.array!(@accounts) do |account|
+  json.id account.id
   json.value account.value
   json.name account.name
   json.corporate_entity account.corporate_entity

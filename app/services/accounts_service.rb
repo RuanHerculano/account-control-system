@@ -27,7 +27,7 @@ class AccountsService
     ResultResponseService.new(success, status, account)
   end
 
-  def self.index
+  def self.all
     Account.all
   end
 

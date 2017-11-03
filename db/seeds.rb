@@ -1,6 +1,6 @@
-corporate_entity = CorporateEntity.create(cnpj: 'MyString', business: 'MyString', trading_name: 'MyString')
+corporate_entity = CorporateEntity.create(cnpj: '04137644195', business: 'MyString', trading_name: 'MyString')
 
-individual_entity = IndividualEntity.create(cpf: 'MyString', full_name: 'MyString', date_birth: '18/03/1995')
+individual_entity = IndividualEntity.create(cpf: '76604380181', full_name: 'MyString', date_birth: '18/03/1995')
 
 Account.create!(
   value: 0,
@@ -21,6 +21,3 @@ Account.create!(
   level: 0,
   status: 'active'
 )
-
-
-

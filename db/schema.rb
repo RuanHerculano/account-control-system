@@ -13,11 +13,12 @@
 ActiveRecord::Schema.define(version: 20171027140641) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.float "value", limit: 24, default: 0.0, null: false
     t.string "name", null: false
     t.bigint "corporate_entity_id"
     t.bigint "individual_entity_id"
     t.bigint "account_id"
-    t.integer "level", null: false
+    t.integer "level", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -32,12 +33,14 @@ ActiveRecord::Schema.define(version: 20171027140641) do
     t.string "trading_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cnpj"], name: "index_corporate_entities_on_cnpj", unique: true
   end
 
   create_table "financial_contributions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.float "value", limit: 24, null: false
     t.bigint "account_id", null: false
     t.string "code", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_financial_contributions_on_account_id"
@@ -49,6 +52,7 @@ ActiveRecord::Schema.define(version: 20171027140641) do
     t.bigint "origin_id", null: false
     t.bigint "destination_id", null: false
     t.string "code", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_financial_transactions_on_code", unique: true
@@ -62,6 +66,7 @@ ActiveRecord::Schema.define(version: 20171027140641) do
     t.date "date_birth", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cpf"], name: "index_individual_entities_on_cpf", unique: true
   end
 
   add_foreign_key "accounts", "accounts", on_delete: :cascade

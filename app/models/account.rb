@@ -9,9 +9,9 @@ class Account < ApplicationRecord
 
   def validate_entity_association
     if corporate_entity_id != nil && individual_entity_id != nil
-      self.errors.add('account can only have one associated entity')
+      self.errors.add(:base, 'account can only have one associated entity')
     elsif corporate_entity_id == nil && individual_entity_id == nil
-      self.errors.add('account must have one associated entity')
+      self.errors.add(:base, 'account must have one associated entity')
     end
   end
 end

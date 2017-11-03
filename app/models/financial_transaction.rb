@@ -3,4 +3,12 @@ class FinancialTransaction < ApplicationRecord
   belongs_to :account, class_name: 'Account', foreign_key: 'destination_id'
 
   enum status: [:completed, :reversaled]
+
+  def origin
+    Account.find(origin_id)
+  end
+
+  def destination
+    Account.find(destination_id)
+  end
 end

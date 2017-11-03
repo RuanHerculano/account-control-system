@@ -1,8 +1,8 @@
 class FinancialTransactionsController < ApplicationController
   def index
-    financial_transaction = FinancialTransaction.all
+    @financial_transactions = FinancialTransaction.all
 
-    render json: financial_transaction
+    render :index
   end
 
   def create

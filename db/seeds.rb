@@ -1,10 +1,18 @@
-corporate_entity = CorporateEntity.create(cnpj: '04137644195', business: 'MyString', trading_name: 'MyString')
+corporate_entity = CorporateEntity.create(
+  cnpj: '60.267.731/0001-20',
+  business: 'Tecnologia da informação',
+  trading_name: 'AIS Digital'
+)
 
-individual_entity = IndividualEntity.create(cpf: '76604380181', full_name: 'MyString', date_birth: '18/03/1995')
+individual_entity = IndividualEntity.create(
+  cpf: '04137644195',
+  full_name: 'Ruan Herculano',
+  date_birth: '18/03/1995'
+)
 
 Account.create!(
   value: 0,
-  name: 'MyString',
+  name: 'Conta poupança Caixa Econômica Federal',
   corporate_entity: corporate_entity,
   individual_entity: nil,
   account: nil,
@@ -14,7 +22,7 @@ Account.create!(
 
 Account.create!(
   value: 0,
-  name: 'MyString',
+  name: 'Conta poupança Banco do Brasil',
   corporate_entity: nil,
   individual_entity: individual_entity,
   account: nil,

@@ -1,16 +1,12 @@
-require 'cpf_cnpj'
-
 class CorporateEntitiesService
   def self.create(corporate_entity_params)
     corporate_entity = CorporateEntity.new(corporate_entity_params)
     success = false
     status = :unprocessable_entity
 
-    if valid_cnpj?(corporate_entity.cnpj)
-      success = corporate_entity.save
-      status = :created if success
-    else
-      corporate_entity.errors.add(:cpf, 'invalid cnpj')
+    if corporate_entity.save
+      success = true
+      status = :created
     end
 
     ResultResponseService.new(success, status, corporate_entity)
@@ -21,11 +17,9 @@ class CorporateEntitiesService
     success = false
     status = :unprocessable_entity
 
-    if valid_cnpj?(corporate_entity_params[:cnpj])
-      success = corporate_entity.update(corporate_entity_params)
-      status = :updated if success
-    else
-      corporate_entity.errors.add(:cnpj, 'invalid cnpj')
+    if corporate_entity.update(corporate_entity_params)
+      success = true
+      status = :updated
     end
 
     ResultResponseService.new(success, status, corporate_entity)

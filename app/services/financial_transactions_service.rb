@@ -2,25 +2,33 @@ class FinancialTransactionsService
   def self.create(financial_transaction_params)
     financial_transaction_params[:code] = generate_unique_code
     financial_transaction = FinancialTransaction.new(financial_transaction_params)
-    origin_account = Account.find(financial_transaction.origin_id)
 
-    result = validations_transaction(origin_account, financial_transaction)
+    begin
+      origin = Account.find(financial_transaction.origin_id)
+      destination = Account.find(financial_transaction.destination_id)
+    rescue ActiveRecord::RecordNotFound => error
+      byebug
+      financial_transaction.errors.add(:base, error.message)
+      return ResultResponseService.new(false, :unprocessable_entity, financial_transaction)
+    end
+
+    result = validations_transaction(origin, financial_transaction)
     unless result.success
       return ResultResponseService.new(result.success, result.status, result.response)
     end
 
-    management_transaction(origin_account, financial_transaction)
+    management_transaction(origin, financial_transaction)
   end
 
-  def self.validations_transaction(origin_account, financial_transaction)
-    active = check_active_account(origin_account, financial_transaction)
-    unless active.success
-      return ResultResponseService.new(active.success, active.status, active.response)
+  def self.validations_transaction(origin, financial_transaction)
+    result = check_active_account(origin, financial_transaction)
+    unless result.success
+      return ResultResponseService.new(result.success, result.status, result.response)
     end
 
-    positive = check_positive_balance(origin_account, financial_transaction)
-    unless positive.success
-      return ResultResponseService.new(positive.success, positive.status, positive.response)
+    result = check_positive_balance(origin, financial_transaction)
+    unless result.success
+      return ResultResponseService.new(result.success, result.status, result.response)
     end
 
     ResultResponseService.new(true, nil, nil)

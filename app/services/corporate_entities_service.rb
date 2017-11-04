@@ -33,11 +33,6 @@ class CorporateEntitiesService
     CorporateEntity.find(id)
   end
 
-  def self.destroy(id)
-    corporate_entity = CorporateEntity.find(id)
-    corporate_entity.destroy
-  end
-
   private
 
   def self.valid_cnpj?(cnpj)

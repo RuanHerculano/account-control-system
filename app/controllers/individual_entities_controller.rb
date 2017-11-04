@@ -31,10 +31,6 @@ class IndividualEntitiesController < ApplicationController
     end
   end
 
-  def destroy
-    IndividualEntitiesService.destroy(params[:id])
-  end
-
   private
 
   def individual_entity_params

@@ -35,11 +35,6 @@ class IndividualEntitiesService
     IndividualEntity.find(id)
   end
 
-  def self.destroy(id)
-    individual_entity = IndividualEntity.find(id)
-    individual_entity.destroy
-  end
-
   private
 
   def self.valid_cpf?(cpf)

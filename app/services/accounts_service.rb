@@ -35,11 +35,6 @@ class AccountsService
     Account.find(id)
   end
 
-  def self.destroy(id)
-    account = Account.find(id)
-    account.destroy
-  end
-
   def self.active_down_level(id)
     account = Account.find(id)
     level = account.level

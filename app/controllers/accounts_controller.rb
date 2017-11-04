@@ -1,13 +1,11 @@
 class AccountsController < ApplicationController
   def index
     @accounts = AccountsService.all
-
     render :index
   end
 
   def show
     result = AccountsService.show(params[:id])
-
     render json: result
   end
 
@@ -21,8 +19,8 @@ class AccountsController < ApplicationController
     end
   end
 
-  def update
-    result = AccountsService.update(params[:id], account_params)
+  def reversal
+    result = AccountsService.reversal(params[:id], account_params)
 
     if result.success
       render json: result.response
@@ -35,8 +33,13 @@ class AccountsController < ApplicationController
     AccountsService.destroy(params[:id])
   end
 
-  def active_accounts_down_level
-    result = AccountsService.active_accounts_down_level(params[:id])
+  def active_down_level
+    result = AccountsService.active_down_level(params[:id])
+    render json: result
+  end
+
+  def active
+    result = AccountsService.active
     render json: result
   end
 

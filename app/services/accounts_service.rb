@@ -13,7 +13,7 @@ class AccountsService
     ResultResponseService.new(success, status, account)
   end
 
-  def self.update(id, account_params)
+  def self.reversal(id, account_params)
     success = false
     status = :unprocessable_entity
     account_params = define_level(account_params)
@@ -40,10 +40,14 @@ class AccountsService
     account.destroy
   end
 
-  def self.active_accounts_down_level(id)
+  def self.active_down_level(id)
     account = Account.find(id)
     level = account.level
     Account.where('level > ? AND status = ?', level, 'active')
+  end
+
+  def self.active
+    Account.where(status: 'active')
   end
 
   def self.define_level(account_params)

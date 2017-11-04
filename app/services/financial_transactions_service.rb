@@ -7,7 +7,6 @@ class FinancialTransactionsService
       origin = Account.find(financial_transaction.origin_id)
       destination = Account.find(financial_transaction.destination_id)
     rescue ActiveRecord::RecordNotFound => error
-      byebug
       financial_transaction.errors.add(:base, error.message)
       return ResultResponseService.new(false, :unprocessable_entity, financial_transaction)
     end

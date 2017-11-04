@@ -25,7 +25,7 @@ class CorporateEntitiesService
     ResultResponseService.new(success, status, corporate_entity)
   end
 
-  def self.index
+  def self.all
     CorporateEntity.all
   end
 

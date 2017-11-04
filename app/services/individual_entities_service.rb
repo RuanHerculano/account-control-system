@@ -1,5 +1,3 @@
-require 'cpf_cnpj'
-
 class IndividualEntitiesService
   def self.create(individual_entity_params)
     individual_entity = IndividualEntity.new(individual_entity_params)
@@ -27,7 +25,7 @@ class IndividualEntitiesService
     ResultResponseService.new(success, status, individual_entity)
   end
 
-  def self.index
+  def self.all
     IndividualEntity.all
   end
 

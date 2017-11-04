@@ -1,6 +1,6 @@
 class CorporateEntitiesController < ApplicationController
   def index
-    result = CorporateEntitiesService.index
+    result = CorporateEntitiesService.all
 
     render json: result
   end

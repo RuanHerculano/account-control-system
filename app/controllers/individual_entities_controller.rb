@@ -1,6 +1,6 @@
 class IndividualEntitiesController < ApplicationController
   def index
-    result = IndividualEntitiesService.index
+    result = IndividualEntitiesService.all
 
     render json: result
   end

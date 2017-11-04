@@ -40,6 +40,12 @@ class AccountsService
     account.destroy
   end
 
+  def self.active_accounts_down_level(id)
+    account = Account.find(id)
+    level = account.level
+    Account.where('level > ? AND status = ?', level, 'active')
+  end
+
   def self.define_level(account_params)
     unless account_params[:account_id]
       account_params[:level] = 0

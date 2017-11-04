@@ -35,6 +35,11 @@ class AccountsController < ApplicationController
     AccountsService.destroy(params[:id])
   end
 
+  def active_accounts_down_level
+    result = AccountsService.active_accounts_down_level(params[:id])
+    render json: result
+  end
+
   private
 
   def account_params

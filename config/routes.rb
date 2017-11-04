@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   resources :corporate_entities
   resources :accounts
 
+  get  '/active_accounts_down_level/:id' => 'accounts#active_accounts_down_level'
+
   get  '/financial_transactions'     => 'financial_transactions#index'
   post '/financial_transactions'     => 'financial_transactions#create'
   put  '/financial_transactions/:id' => 'financial_transactions#reversal'

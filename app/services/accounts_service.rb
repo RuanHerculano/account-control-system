@@ -13,7 +13,7 @@ class AccountsService
     ResultResponseService.new(success, status, account)
   end
 
-  def self.reversal(id, account_params)
+  def self.update(id, account_params)
     success = false
     status = :unprocessable_entity
     account_params = define_level(account_params)

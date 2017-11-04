@@ -19,8 +19,8 @@ class AccountsController < ApplicationController
     end
   end
 
-  def reversal
-    result = AccountsService.reversal(params[:id], account_params)
+  def update
+    result = AccountsService.update(params[:id], account_params)
 
     if result.success
       render json: result.response

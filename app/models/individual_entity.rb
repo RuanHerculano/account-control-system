@@ -3,14 +3,11 @@ class IndividualEntity < ApplicationRecord
   validates :full_name,  presence: true
   validates :date_birth, presence: true
 
-  validate :validate_cpf, :validate_date
+  validate :validate_cpf, :validate_duplicate_cpf
 
-  def validate_date
-    if Date.today < date_birth
-      self.errors.add(:date_birth, 'birthday date can not be greater than current')
-    elsif date_birth.year < Date.today.year - 150
-      self.errors.add(:date_birth, 'Individual entity can not be more than 150 years old')
-    end
+  def validate_duplicate_cpf
+    return false unless id.blank?
+    self.errors.add(:cpf, 'duplicate cpf') if IndividualEntity.find_by(cpf: cpf)
   end
 
   def validate_cpf

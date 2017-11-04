@@ -9,7 +9,7 @@ class FinancialTransactionsService
       return ResultResponseService.new(result.success, result.status, result.response)
     end
 
-    management_transaction
+    management_transaction(origin_account, financial_transaction)
   end
 
   def self.validations_transaction(origin_account, financial_transaction)
@@ -61,8 +61,8 @@ class FinancialTransactionsService
     financial_transaction = FinancialTransaction.find(id)
 
     if financial_transaction.status == 'completed'
-      update_origin(financial_transaction)
-      update_destination(financial_transaction)
+      increment_origin(financial_transaction)
+      subtract_destination(financial_transaction)
       financial_transaction.update(status: 'reversaled')
     else
       success = false
@@ -74,7 +74,7 @@ class FinancialTransactionsService
   end
 
   def self.subtract_origin(origin_account, financial_transaction)
-    new_value = origin_account.value + financial_transaction.value
+    new_value = origin_account.value - financial_transaction.value
     origin_account.update(value: new_value)
   end
   private_class_method :subtract_origin
@@ -86,19 +86,19 @@ class FinancialTransactionsService
   end
   private_class_method :increment_destination
 
-  def self.update_origin(financial_transaction)
+  def self.increment_origin(financial_transaction)
     origin_account = Account.find(financial_transaction.origin_id)
     new_value = origin_account.value + financial_transaction.value
     origin_account.update(value: new_value)
   end
-  private_class_method :update_origin
+  private_class_method :increment_origin
 
-  def self.update_destination(financial_transaction)
+  def self.subtract_destination(financial_transaction)
     destination_account = Account.find(financial_transaction.destination_id)
     new_value = destination_account.value - financial_transaction.value
     destination_account.update(value: new_value)
   end
-  private_class_method :update_destination
+  private_class_method :subtract_destination
 
   def self.generate_unique_code
     code = nil

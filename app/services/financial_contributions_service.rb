@@ -13,6 +13,8 @@ class FinancialContributionsService
     )
 
     if financial_contribution.save
+      account = Account.find(financial_contribution.account_id)
+      account.update(value: financial_contribution.value)
       success = true
       status = :created
     end

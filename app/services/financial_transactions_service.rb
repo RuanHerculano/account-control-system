@@ -18,7 +18,6 @@ class FinancialTransactionsService
     @financial_transaction = FinancialTransaction.find(id)
     set_origin
     set_destination
-
     validate_reversal
 
     unless @financial_transaction.errors.messages.blank?
@@ -29,21 +28,16 @@ class FinancialTransactionsService
   end
 
   def self.management_transaction
-    success = false
+    success = @financial_transaction.save && subtract_origin && increment_destination
     status = :unprocessable_entity
-    subtract_origin
-    increment_destination
-    success = @financial_transaction.save
     status = :created if success
 
     ResultResponseService.new(success, status, @financial_transaction)
   end
 
   def self.management_reversal
-    success = false
+    success = @financial_transaction.update(status: 'reversaled') && increment_origin && subtract_destination
     status = :unprocessable_entity
-
-    success = reversal_execute
     status = :updated if success
 
     ResultResponseService.new(success, status, @financial_transaction)
@@ -69,13 +63,6 @@ class FinancialTransactionsService
     end
   end
   private_class_method :validate_reversal
-
-  def self.reversal_execute
-    increment_origin
-    subtract_destination
-    @financial_transaction.update(status: 'reversaled')
-  end
-  private_class_method :reversal_execute
 
   def self.set_origin
     begin

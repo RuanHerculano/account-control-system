@@ -9,12 +9,10 @@ class FinancialContributionsService
   end
 
   def self.managament_contribution
-    success = false
-    status = :unprocessable_entity
-    success = @financial_contribution.save
-    status = :created if success
     set_origin
-    increment_origin
+    success = @financial_contribution.save && increment_origin
+    status = :unprocessable_entity
+    status = :created if success
 
     ResultResponseService.new(success, status, @financial_contribution)
   end
@@ -53,12 +51,11 @@ class FinancialContributionsService
   end
 
   def self.reverval_financial_contribution
-    success = false
-    status = :unprocessable_entity
-    success = @financial_contribution.update(status: 'reversaled')
-    status = :update if success
     set_origin
-    subtract_destination
+    success = @financial_contribution.update(status: 'reversaled') && subtract_destination
+    status = :unprocessable_entity
+    status = :update if success
+
     ResultResponseService.new(success, status, @financial_contribution)
   end
 

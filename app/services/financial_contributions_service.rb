@@ -46,7 +46,7 @@ class FinancialContributionsService
 
   def self.validate_code(code)
     if @financial_contribution.code != code
-      financial_contribution.errors.add(:code, 'invalid code')
+      @financial_contribution.errors.add(:code, 'invalid code')
     end
   end
 

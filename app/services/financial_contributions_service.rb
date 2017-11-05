@@ -13,8 +13,10 @@ class FinancialContributionsService
     )
 
     if financial_contribution.save
+      byebug
       account = Account.find(financial_contribution.account_id)
-      account.update(value: financial_contribution.value)
+      new_value = account.value + financial_contribution.value
+      account.update(value: new_value)
       success = true
       status = :created
     end

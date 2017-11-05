@@ -13,7 +13,6 @@ class FinancialContributionsService
     )
 
     if financial_contribution.save
-      byebug
       account = Account.find(financial_contribution.account_id)
       new_value = account.value + financial_contribution.value
       account.update(value: new_value)
@@ -29,11 +28,11 @@ class FinancialContributionsService
     result = validate_status(financial_contribution)
     return result unless result.success
 
-    result = validate_code(financial_contribution)
+    code = financial_contribution_params[:code]
+    result = validate_code(financial_contribution, code)
     return result unless result.success
 
-    code = financial_contribution_params[:code]
-    reverval_financial_contribution(financial_contribution, code)
+    reverval_financial_contribution(financial_contribution)
   end
 
   def self.validate_status(financial_contribution)

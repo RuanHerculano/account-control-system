@@ -69,9 +69,9 @@ ActiveRecord::Schema.define(version: 20171027140641) do
     t.index ["cpf"], name: "index_individual_entities_on_cpf", unique: true
   end
 
-  add_foreign_key "accounts", "accounts", on_delete: :cascade
-  add_foreign_key "accounts", "corporate_entities", on_delete: :cascade
-  add_foreign_key "accounts", "individual_entities", on_delete: :cascade
+  add_foreign_key "accounts", "accounts"
+  add_foreign_key "accounts", "corporate_entities"
+  add_foreign_key "accounts", "individual_entities"
   add_foreign_key "financial_contributions", "accounts"
   add_foreign_key "financial_transactions", "accounts", column: "destination_id"
   add_foreign_key "financial_transactions", "accounts", column: "origin_id"

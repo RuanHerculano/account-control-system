@@ -23,33 +23,47 @@ class FinancialContributionsService
   end
 
   def self.reversal(id, financial_contribution_params)
-    code = financial_contribution_params[:code]
     financial_contribution = FinancialContribution.find(id)
+    result = validate_status(financial_contribution)
+    return result unless result.success
 
-    result_response = valid_status(financial_contribution)
-    return result_response unless result_response.status
+    result = validate_code(financial_contribution)
+    return result unless result.success
 
+    code = financial_contribution_params[:code]
     reverval_financial_contribution(financial_contribution, code)
   end
 
   def self.validate_status(financial_contribution)
     if financial_contribution.status == 'reversaled'
-      financial_contribution.errors.add(:code, 'this reversal already been reversed ')
+      financial_contribution.errors.add(:code, 'this reversal already been reversed')
       return ResultResponseService.new(false, :unprocessable_entity, financial_contribution)
     end
 
     ResultResponseService.new(true, nil, nil)
   end
 
-  def self.reverval_financial_contribution(financial_contribution, code)
-    unless financial_contribution.code == code
+  def self.validate_code(financial_contribution, code)
+    if financial_contribution.code != code
       financial_contribution.errors.add(:code, 'invalid code')
-      return ResultResponseService.new(success, status, financial_contribution)
+      return ResultResponseService.new(false, :unprocessable_entity, financial_contribution)
     end
 
+    ResultResponseService.new(true, nil, nil)
+  end
+
+  def self.reverval_financial_contribution(financial_contribution)
     financial_contribution.update(status: 'reversaled')
+    subtract_destination(financial_contribution)
     ResultResponseService.new(true, :updated, financial_contribution)
   end
+
+  def self.subtract_destination(financial_transaction)
+    destination_account = Account.find(financial_transaction.account_id)
+    new_value = destination_account.value - financial_transaction.value
+    destination_account.update(value: new_value)
+  end
+  private_class_method :subtract_destination
 
   def self.generate_unique_code
     code = nil

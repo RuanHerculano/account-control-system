@@ -20,15 +20,15 @@ class FinancialContributionsService
   end
 
   def self.reversal(id, financial_contribution_params)
-    financial_contribution = FinancialContribution.find(id)
-    result = validate_status(financial_contribution)
-    return result unless result.success
+    @financial_contribution = FinancialContribution.find(id)
+    validate_status
+    validate_code(financial_contribution_params[:code])
 
-    code = financial_contribution_params[:code]
-    result = validate_code(financial_contribution, code)
-    return result unless result.success
+    unless @financial_contribution.errors.messages.blank?
+      return ResultResponseService.new(false, :unprocessable_entity, @financial_contribution)
+    end
 
-    reverval_financial_contribution(financial_contribution)
+    reverval_financial_contribution
   end
 
   def self.set_origin
@@ -40,29 +40,26 @@ class FinancialContributionsService
   end
   private_class_method :set_origin
 
-
-  def self.validate_status(financial_contribution)
-    if financial_contribution.status == 'reversaled'
+  def self.validate_status
+    if @financial_contribution.status == 'reversaled'
       financial_contribution.errors.add(:code, 'this reversal already been reversed')
-      return ResultResponseService.new(false, :unprocessable_entity, financial_contribution)
     end
-
-    ResultResponseService.new(true, nil, nil)
   end
 
-  def self.validate_code(financial_contribution, code)
-    if financial_contribution.code != code
+  def self.validate_code(code)
+    if @financial_contribution.code != code
       financial_contribution.errors.add(:code, 'invalid code')
-      return ResultResponseService.new(false, :unprocessable_entity, financial_contribution)
     end
-
-    ResultResponseService.new(true, nil, nil)
   end
 
-  def self.reverval_financial_contribution(financial_contribution)
-    financial_contribution.update(status: 'reversaled')
-    subtract_destination(financial_contribution)
-    ResultResponseService.new(true, :updated, financial_contribution)
+  def self.reverval_financial_contribution
+    success = false
+    status = :unprocessable_entity
+    success = @financial_contribution.update(status: 'reversaled')
+    status = :update if success
+    set_origin
+    subtract_destination
+    ResultResponseService.new(success, status, @financial_contribution)
   end
 
   def self.increment_origin
@@ -71,10 +68,9 @@ class FinancialContributionsService
   end
   private_class_method :increment_origin
 
-  def self.subtract_destination(financial_transaction)
-    destination_account = Account.find(financial_transaction.account_id)
-    new_value = destination_account.value - financial_transaction.value
-    destination_account.update(value: new_value)
+  def self.subtract_destination
+    new_value = @origin.value - @financial_contribution.value
+    origin.update(value: new_value)
   end
   private_class_method :subtract_destination
 

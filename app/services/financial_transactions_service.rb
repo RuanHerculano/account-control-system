@@ -2,35 +2,30 @@ class FinancialTransactionsService
   def self.create(financial_transaction_params)
     financial_transaction_params[:code] = generate_unique_code
     @financial_transaction = FinancialTransaction.new(financial_transaction_params)
+    set_origin
+    set_destination
+    check_active_account
+    check_positive_balance
 
-    begin
-      @origin = Account.find(@financial_transaction.origin_id)
-      @destination = Account.find(@financial_transaction.destination_id)
-    rescue ActiveRecord::RecordNotFound => error
-      @financial_transaction.errors.add(:base, error.message)
-      return ResultResponseService.new(false, :unprocessable_entity, financial_transaction)
-    end
-
-    result = validations_transaction
-    unless result.success
-      return ResultResponseService.new(result.success, result.status, result.response)
+    unless @financial_transaction.errors.messages.blank?
+      return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
 
     management_transaction
   end
 
-  def self.validations_transaction
-    result = check_active_account
-    unless result.success
-      return ResultResponseService.new(result.success, result.status, result.response)
+  def self.reversal(id)
+    @financial_transaction = FinancialTransaction.find(id)
+    set_origin
+    set_destination
+
+    validate_reversal
+
+    unless @financial_transaction.errors.messages.blank?
+      return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
 
-    result = check_positive_balance
-    unless result.success
-      return ResultResponseService.new(result.success, result.status, result.response)
-    end
-
-    ResultResponseService.new(true, nil, nil)
+    management_reversal
   end
 
   def self.management_transaction
@@ -44,43 +39,61 @@ class FinancialTransactionsService
     ResultResponseService.new(success, status, @financial_transaction)
   end
 
+  def self.management_reversal
+    success = false
+    status = :unprocessable_entity
+
+    success = reversal_execute
+    status = :updated if success
+
+    ResultResponseService.new(success, status, @financial_transaction)
+  end
+
   def self.check_active_account
     if @origin.status != 'active'
       @financial_transaction.errors.add(:status, 'transfers need to be for active accounts')
-      return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
-
-    ResultResponseService.new(true, nil, nil)
   end
+  private_class_method :check_active_account
 
   def self.check_positive_balance
     if @origin.value < @financial_transaction.value
       @financial_transaction.errors.add(:value, 'origin account has insufficient value for this transaction')
-      return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
-
-    ResultResponseService.new(true, nil, nil)
   end
+  private_class_method :check_positive_balance
 
-  def self.reversal(id)
-    success = true
-    status = :updated
-    @financial_transaction = FinancialTransaction.find(id)
-    @origin = Account.find(@financial_transaction.origin_id)
-    @destination = Account.find(@financial_transaction.destination_id)
-
-    if @financial_transaction.status == 'completed'
-      increment_origin
-      subtract_destination
-      @financial_transaction.update(status: 'reversaled')
-    else
-      success = false
-      status = :unprocessable_entity
+  def self.validate_reversal
+    if @financial_transaction.status != 'completed'
       @financial_transaction.errors.add(:status, 'is impossible to reverse a transaction that is already reversaled')
     end
-
-    ResultResponseService.new(success, status, @financial_transaction)
   end
+  private_class_method :validate_reversal
+
+  def self.reversal_execute
+    increment_origin
+    subtract_destination
+    @financial_transaction.update(status: 'reversaled')
+  end
+  private_class_method :reversal_execute
+
+  def self.set_origin
+    begin
+      @origin = Account.find(@financial_transaction.origin_id)
+    rescue ActiveRecord::RecordNotFound => error
+      @financial_transaction.errors.add(:origin_id, error.message)
+    end
+  end
+  private_class_method :set_origin
+
+  def self.set_destination
+    begin
+      @destination = Account.find(@financial_transaction.destination_id)
+    rescue ActiveRecord::RecordNotFound => error
+      @financial_transaction.errors.add(:destination_id , error.message)
+    end
+  end
+  private_class_method :set_destination
 
   def self.subtract_origin
     new_value = @origin.value - @financial_transaction.value

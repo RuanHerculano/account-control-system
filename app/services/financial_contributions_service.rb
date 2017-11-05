@@ -42,7 +42,7 @@ class FinancialContributionsService
 
   def self.validate_status
     if @financial_contribution.status == 'reversaled'
-      financial_contribution.errors.add(:code, 'this reversal already been reversed')
+      @financial_contribution.errors.add(:code, 'this reversal already been reversed')
     end
   end
 
@@ -70,7 +70,7 @@ class FinancialContributionsService
 
   def self.subtract_destination
     new_value = @origin.value - @financial_contribution.value
-    origin.update(value: new_value)
+    @origin.update(value: new_value)
   end
   private_class_method :subtract_destination
 

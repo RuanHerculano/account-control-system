@@ -4,28 +4,28 @@ class FinancialTransactionsService
     @financial_transaction = FinancialTransaction.new(financial_transaction_params)
 
     begin
-      origin = Account.find(@financial_transaction.origin_id)
-      destination = Account.find(@financial_transaction.destination_id)
+      @origin = Account.find(@financial_transaction.origin_id)
+      @destination = Account.find(@financial_transaction.destination_id)
     rescue ActiveRecord::RecordNotFound => error
       @financial_transaction.errors.add(:base, error.message)
       return ResultResponseService.new(false, :unprocessable_entity, financial_transaction)
     end
 
-    result = validations_transaction(origin)
+    result = validations_transaction
     unless result.success
       return ResultResponseService.new(result.success, result.status, result.response)
     end
 
-    management_transaction(origin)
+    management_transaction
   end
 
-  def self.validations_transaction(origin)
-    result = check_active_account(origin)
+  def self.validations_transaction
+    result = check_active_account
     unless result.success
       return ResultResponseService.new(result.success, result.status, result.response)
     end
 
-    result = check_positive_balance(origin)
+    result = check_positive_balance
     unless result.success
       return ResultResponseService.new(result.success, result.status, result.response)
     end
@@ -33,10 +33,10 @@ class FinancialTransactionsService
     ResultResponseService.new(true, nil, nil)
   end
 
-  def self.management_transaction(origin_account)
+  def self.management_transaction
     success = false
     status = :unprocessable_entity
-    subtract_origin(origin_account)
+    subtract_origin
     increment_destination
     success = @financial_transaction.save
     status = :created if success
@@ -44,8 +44,8 @@ class FinancialTransactionsService
     ResultResponseService.new(success, status, @financial_transaction)
   end
 
-  def self.check_active_account(origin_account)
-    if origin_account.status != 'active'
+  def self.check_active_account
+    if @origin.status != 'active'
       @financial_transaction.errors.add(:status, 'transfers need to be for active accounts')
       return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
@@ -53,8 +53,8 @@ class FinancialTransactionsService
     ResultResponseService.new(true, nil, nil)
   end
 
-  def self.check_positive_balance(origin_account)
-    if origin_account.value < @financial_transaction.value
+  def self.check_positive_balance
+    if @origin.value < @financial_transaction.value
       @financial_transaction.errors.add(:value, 'origin account has insufficient value for this transaction')
       return ResultResponseService.new(false, :unprocessable_entity, @financial_transaction)
     end
@@ -65,7 +65,7 @@ class FinancialTransactionsService
   def self.reversal(id)
     success = true
     status = :updated
-    financial_transaction = FinancialTransaction.find(id)
+    @financial_transaction = FinancialTransaction.find(id)
 
     if financial_transaction.status == 'completed'
       increment_origin(financial_transaction)
@@ -80,16 +80,15 @@ class FinancialTransactionsService
     ResultResponseService.new(success, status, financial_transaction)
   end
 
-  def self.subtract_origin(origin_account)
-    new_value = origin_account.value - @financial_transaction.value
-    origin_account.update(value: new_value)
+  def self.subtract_origin
+    new_value = @origin.value - @financial_transaction.value
+    @origin.update(value: new_value)
   end
   private_class_method :subtract_origin
 
   def self.increment_destination
-    destination_account = Account.find(@financial_transaction.destination_id)
-    new_value = destination_account.value + @financial_transaction.value
-    destination_account.update(value: new_value)
+    new_value = @destination.value + @financial_transaction.value
+    @destination.update(value: new_value)
   end
   private_class_method :increment_destination
 

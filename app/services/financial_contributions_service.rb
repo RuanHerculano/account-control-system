@@ -2,25 +2,21 @@ require 'securerandom'
 
 class FinancialContributionsService
   def self.create(financial_contribution_params)
+    financial_contribution_params[:code] = generate_unique_code
+    @financial_contribution = FinancialContribution.new(financial_contribution_params)
+
+    managament_contribution
+  end
+
+  def self.managament_contribution
     success = false
     status = :unprocessable_entity
+    success = @financial_contribution.save
+    status = :created if success
+    set_origin
+    increment_origin
 
-    financial_contribution = FinancialContribution.new(
-      value: financial_contribution_params[:value],
-      account_id: financial_contribution_params[:account_id],
-      code: generate_unique_code,
-      status: 'completed'
-    )
-
-    if financial_contribution.save
-      account = Account.find(financial_contribution.account_id)
-      new_value = account.value + financial_contribution.value
-      account.update(value: new_value)
-      success = true
-      status = :created
-    end
-
-    ResultResponseService.new(success, status, financial_contribution)
+    ResultResponseService.new(success, status, @financial_contribution)
   end
 
   def self.reversal(id, financial_contribution_params)
@@ -34,6 +30,16 @@ class FinancialContributionsService
 
     reverval_financial_contribution(financial_contribution)
   end
+
+  def self.set_origin
+    begin
+      @origin = Account.find(@financial_contribution.account_id)
+    rescue ActiveRecord::RecordNotFound => error
+      @financial_transaction.errors.add(:account_id, error.message)
+    end
+  end
+  private_class_method :set_origin
+
 
   def self.validate_status(financial_contribution)
     if financial_contribution.status == 'reversaled'
@@ -58,6 +64,12 @@ class FinancialContributionsService
     subtract_destination(financial_contribution)
     ResultResponseService.new(true, :updated, financial_contribution)
   end
+
+  def self.increment_origin
+    new_value = @origin.value + @financial_contribution.value
+    @origin.update(value: new_value)
+  end
+  private_class_method :increment_origin
 
   def self.subtract_destination(financial_transaction)
     destination_account = Account.find(financial_transaction.account_id)
